@@ -104,7 +104,7 @@ namespace PulseChain.Core {
             _adHooksSystem.Initialize(this);
             _nodeSpawner.Initialize(_uiManager.GameplayRoot, _difficultySettings);
             _pulseController.Initialize(_uiManager.GameplayRoot, _difficultySettings, _pulseStyleConfig, _nodeSpawner);
-            StartRun();
+            ShowTutorial();
         }
 
         private void Update() {
@@ -136,6 +136,18 @@ namespace PulseChain.Core {
             ScoreChanged?.Invoke(_score, _combo);
             OverloadStateChanged?.Invoke(false);
             RunStarted?.Invoke();
+        }
+
+        public void ShowTutorial() {
+            _runState = GameRunState.None;
+            Time.timeScale = 1.0f;
+            _slowMotionActive = false;
+            _uiManager.ShowTutorial();
+        }
+
+        public void StartRunFromTutorial() {
+            _uiManager.HideTutorial();
+            StartRun();
         }
 
         public void RestartRun() {

@@ -19,6 +19,10 @@ namespace PulseChain.Gameplay {
         private TextMeshProUGUI _metaText;
         private Image _energyFill;
         private Image _screenFlash;
+        private GameObject _tutorialPanel;
+        private TextMeshProUGUI _tutorialTitleText;
+        private TextMeshProUGUI _tutorialBodyText;
+        private Button _tutorialStartButton;
         private GameObject _gameOverPanel;
         private TextMeshProUGUI _gameOverText;
         private Button _restartButton;
@@ -36,6 +40,7 @@ namespace PulseChain.Gameplay {
             _gameManager = gameManager;
             EnsureCanvas();
             EnsureEventSystem();
+            BuildTutorialPanel();
             BuildHud();
             BuildGameOverPanel();
         }
@@ -74,8 +79,25 @@ namespace PulseChain.Gameplay {
         }
 
         public void ShowRunHud() {
+            HideTutorial();
             if (_gameOverPanel != null) {
                 _gameOverPanel.SetActive(false);
+            }
+        }
+
+        public void ShowTutorial() {
+            if (_tutorialPanel != null) {
+                _tutorialPanel.SetActive(true);
+            }
+
+            if (_gameOverPanel != null) {
+                _gameOverPanel.SetActive(false);
+            }
+        }
+
+        public void HideTutorial() {
+            if (_tutorialPanel != null) {
+                _tutorialPanel.SetActive(false);
             }
         }
 
@@ -201,6 +223,52 @@ namespace PulseChain.Gameplay {
             StretchRect(energyFillRect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
         }
 
+        private void BuildTutorialPanel() {
+            _tutorialPanel = new GameObject("TutorialPanel");
+            _tutorialPanel.transform.SetParent(transform, false);
+            Image tutorialPanelImage = _tutorialPanel.AddComponent<Image>();
+            tutorialPanelImage.color = new Color(0.02f, 0.03f, 0.08f, 0.92f);
+            RectTransform panelRect = _tutorialPanel.GetComponent<RectTransform>();
+            StretchRect(panelRect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+
+            _tutorialTitleText = CreateText("TutorialTitle", panelRect, 72.0f, TextAlignmentOptions.Center, Vector2.zero);
+            _tutorialTitleText.text = "Pulse Chain";
+            RectTransform titleRect = _tutorialTitleText.GetComponent<RectTransform>();
+            titleRect.anchorMin = new Vector2(0.5f, 0.5f);
+            titleRect.anchorMax = new Vector2(0.5f, 0.5f);
+            titleRect.anchoredPosition = new Vector2(0.0f, 340.0f);
+            titleRect.sizeDelta = new Vector2(900.0f, 120.0f);
+
+            _tutorialBodyText = CreateText("TutorialBody", panelRect, 34.0f, TextAlignmentOptions.Center, Vector2.zero);
+            _tutorialBodyText.text =
+                "Tap when the pulse reaches the next node and its green accept zone is aligned.\n\n" +
+                "Tap on the right half of the screen to take the faster risk path.\n\n" +
+                "Hold to slow time, but your energy bar will drain.\n\n" +
+                "A mistimed tap or a missed transfer breaks the chain.";
+            _tutorialBodyText.textWrappingMode = TextWrappingModes.Normal;
+            RectTransform bodyRect = _tutorialBodyText.GetComponent<RectTransform>();
+            bodyRect.anchorMin = new Vector2(0.5f, 0.5f);
+            bodyRect.anchorMax = new Vector2(0.5f, 0.5f);
+            bodyRect.anchoredPosition = new Vector2(0.0f, 30.0f);
+            bodyRect.sizeDelta = new Vector2(920.0f, 520.0f);
+
+            GameObject buttonObject = new GameObject("TutorialStartButton");
+            buttonObject.transform.SetParent(_tutorialPanel.transform, false);
+            Image buttonImage = buttonObject.AddComponent<Image>();
+            buttonImage.color = new Color(0.34f, 0.82f, 1.0f, 1.0f);
+            _tutorialStartButton = buttonObject.AddComponent<Button>();
+            _tutorialStartButton.onClick.AddListener(StartTutorialRun);
+            RectTransform buttonRect = buttonObject.GetComponent<RectTransform>();
+            buttonRect.anchorMin = new Vector2(0.5f, 0.5f);
+            buttonRect.anchorMax = new Vector2(0.5f, 0.5f);
+            buttonRect.anchoredPosition = new Vector2(0.0f, -360.0f);
+            buttonRect.sizeDelta = new Vector2(380.0f, 110.0f);
+
+            TextMeshProUGUI buttonText = CreateText("TutorialStartText", buttonRect, 42.0f, TextAlignmentOptions.Center, Vector2.zero);
+            buttonText.text = "Start Run";
+            StretchRect(buttonText.GetComponent<RectTransform>(), Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+        }
+
         private void BuildGameOverPanel() {
             _gameOverPanel = new GameObject("GameOverPanel");
             _gameOverPanel.transform.SetParent(transform, false);
@@ -263,6 +331,10 @@ namespace PulseChain.Gameplay {
 
         private void RestartGame() {
             _gameManager.RestartRun();
+        }
+
+        private void StartTutorialRun() {
+            _gameManager.StartRunFromTutorial();
         }
 
         private void StretchRect(RectTransform rectTransform, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax) {
