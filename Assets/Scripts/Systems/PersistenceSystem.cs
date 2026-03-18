@@ -7,6 +7,7 @@ namespace PulseChain.Gameplay {
         private const string HighScoreKey = "PulseChain.HighScore";
         private const string DailyDateKey = "PulseChain.DailyDate";
         private const string DailyBestKey = "PulseChain.DailyBest";
+        private const string TutorialCompletedKey = "PulseChain.TutorialCompleted";
 
         public int HighScore { get; private set; }
 
@@ -24,6 +25,15 @@ namespace PulseChain.Gameplay {
         public int GetDailyBest() {
             ResetDailyIfNeeded();
             return PlayerPrefs.GetInt(DailyBestKey, 0);
+        }
+
+        public bool IsTutorialCompleted() {
+            return PlayerPrefs.GetInt(TutorialCompletedKey, 0) == 1;
+        }
+
+        public void SetTutorialCompleted() {
+            PlayerPrefs.SetInt(TutorialCompletedKey, 1);
+            PlayerPrefs.Save();
         }
 
         public void RegisterScore(int score) {

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+using PulseChain.Core;
+
 using UnityEngine;
 
 namespace PulseChain.Gameplay {
@@ -94,8 +96,9 @@ namespace PulseChain.Gameplay {
         }
 
         private void EnsureChildren(PulseChainNode currentNode, int score) {
+            bool tutorialActive = GameManager.Instance != null && GameManager.Instance.IsTutorialActive;
             if (currentNode.SafeNext != null) {
-                if (currentNode.IsBranchNode && currentNode.RiskNext == null) {
+                if (!tutorialActive && currentNode.IsBranchNode && currentNode.RiskNext == null) {
                     currentNode.RiskNext = CreateSequentialNode(currentNode, true, score);
                     _activeNodes.Add(currentNode.RiskNext);
                     RebuildViews();
@@ -104,7 +107,7 @@ namespace PulseChain.Gameplay {
                 return;
             }
 
-            bool allowBranch = (score >= 25) && (currentNode.Id > 1);
+            bool allowBranch = !tutorialActive && (score >= 25) && (currentNode.Id > 1);
             bool createBranch = allowBranch && (_random.NextDouble() <= _settings.BranchChance);
             currentNode.IsBranchNode = createBranch;
             currentNode.SafeNext = CreateSequentialNode(currentNode, false, score);
@@ -119,16 +122,26 @@ namespace PulseChain.Gameplay {
         }
 
         private PulseChainNode CreateSequentialNode(PulseChainNode parentNode, bool riskPath, int score) {
+            bool tutorialActive = GameManager.Instance != null && GameManager.Instance.IsTutorialActive;
             float horizontalOffset = _settings.BaseNodeDistance + GetRandomRange(-_settings.NodeDistanceVariance, _settings.NodeDistanceVariance);
+            if (tutorialActive) {
+                horizontalOffset = _settings.BaseNodeDistance * 0.9f;
+            }
+
             if (riskPath) {
                 horizontalOffset += 40.0f;
             }
 
             float verticalOffset = riskPath ? 150.0f : GetRandomRange(-80.0f, 80.0f);
+            if (tutorialActive) {
+                verticalOffset = 0.0f;
+            }
+
             Vector2 position = parentNode.BasePosition + new Vector2(horizontalOffset, verticalOffset);
-            bool isMoving = score >= 60 && (_random.NextDouble() > 0.5d);
-            bool hasFakeBranch = score >= 80 && (_random.NextDouble() > 0.55d);
-            PulseChainNode node = CreateNode(position, Mathf.Clamp01(score / 180.0f), isMoving, riskPath, hasFakeBranch);
+            bool isMoving = !tutorialActive && score >= 60 && (_random.NextDouble() > 0.5d);
+            bool hasFakeBranch = !tutorialActive && score >= 80 && (_random.NextDouble() > 0.55d);
+            float difficultyFactor = tutorialActive ? 0.0f : Mathf.Clamp01(score / 180.0f);
+            PulseChainNode node = CreateNode(position, difficultyFactor, isMoving, riskPath, hasFakeBranch);
             return node;
         }
 

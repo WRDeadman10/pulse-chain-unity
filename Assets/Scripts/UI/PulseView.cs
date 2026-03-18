@@ -9,6 +9,7 @@ namespace PulseChain.Gameplay {
         private readonly List<Image> _trailImages = new List<Image>(6);
         private RectTransform _rectTransform;
         private Image _image;
+        private Image _glowImage;
 
         public void Configure(float size) {
             EnsureVisuals(size);
@@ -22,8 +23,9 @@ namespace PulseChain.Gameplay {
 
         public void SetVisualState(PulseVisualStyle style, bool overload, float progress) {
             EnsureVisuals(30.0f);
-            Color pulseColor = overload ? new Color(1.0f, 0.45f, 0.2f, 1.0f) : new Color(0.95f, 1.0f, 1.0f, 1.0f);
+            Color pulseColor = overload ? new Color(1.0f, 0.45f, 0.2f, 1.0f) : Color.Lerp(new Color(0.55f, 0.95f, 1.0f, 1.0f), new Color(0.92f, 1.0f, 0.88f, 1.0f), Mathf.Clamp01(progress));
             _image.color = pulseColor;
+            _glowImage.color = new Color(pulseColor.r, pulseColor.g, pulseColor.b, overload ? 0.28f : 0.20f);
 
             if (style == PulseVisualStyle.Square) {
                 _image.sprite = SpriteFactory.GetSquareSprite();
@@ -33,6 +35,7 @@ namespace PulseChain.Gameplay {
 
             float scale = 1.0f + (Mathf.Sin(progress * Mathf.PI) * 0.18f);
             _rectTransform.localScale = new Vector3(scale, scale, 1.0f);
+            _glowImage.rectTransform.localScale = new Vector3(1.6f + (scale * 0.25f), 1.6f + (scale * 0.25f), 1.0f);
             UpdateTrailImages(pulseColor);
         }
 
@@ -47,6 +50,12 @@ namespace PulseChain.Gameplay {
             }
 
             _rectTransform.sizeDelta = new Vector2(size, size);
+            GameObject glowObject = new GameObject("Glow");
+            glowObject.transform.SetParent(transform, false);
+            _glowImage = glowObject.AddComponent<Image>();
+            _glowImage.sprite = SpriteFactory.GetCircleSprite();
+            _glowImage.raycastTarget = false;
+            _glowImage.rectTransform.sizeDelta = new Vector2(size * 2.0f, size * 2.0f);
             _image = gameObject.GetComponent<Image>();
             if (_image == null) {
                 _image = gameObject.AddComponent<Image>();

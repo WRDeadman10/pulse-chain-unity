@@ -8,6 +8,7 @@ namespace PulseChain.Gameplay {
         private readonly List<Image> _zoneMarkers = new List<Image>(3);
         private RectTransform _rectTransform;
         private Image _coreImage;
+        private Image _glowImage;
         private Outline _outline;
 
         public void Configure(PulseChainNode node) {
@@ -35,8 +36,12 @@ namespace PulseChain.Gameplay {
 
         public void UpdateVisuals(PulseChainNode node, float time, float zoneCycleSpeed) {
             EnsureVisuals();
-            _coreImage.color = node.IsRiskPath ? new Color(1.0f, 0.56f, 0.38f, 1.0f) : new Color(0.35f, 0.88f, 1.0f, 1.0f);
+            float pulseScale = 1.0f + (Mathf.Sin((time * 2.1f) + node.Id) * 0.06f);
+            _rectTransform.localScale = new Vector3(pulseScale, pulseScale, 1.0f);
+            _coreImage.color = node.IsRiskPath ? new Color(1.0f, 0.56f, 0.38f, 1.0f) : Color.Lerp(new Color(0.28f, 0.74f, 1.0f, 1.0f), new Color(0.45f, 1.0f, 0.95f, 1.0f), (Mathf.Sin(time + node.Id) + 1.0f) * 0.5f);
             _outline.effectColor = node.IsBranchNode ? new Color(1.0f, 0.95f, 0.5f, 0.85f) : new Color(1.0f, 1.0f, 1.0f, 0.35f);
+            _glowImage.color = node.IsRiskPath ? new Color(1.0f, 0.35f, 0.22f, 0.20f) : new Color(0.20f, 0.90f, 1.0f, 0.18f);
+            _glowImage.rectTransform.localScale = new Vector3(1.45f + (Mathf.Sin(time * 2.5f) * 0.08f), 1.45f + (Mathf.Sin(time * 2.5f) * 0.08f), 1.0f);
 
             for (int i = 0; i < node.Zones.Count; i++) {
                 AcceptZoneState zone = node.Zones[i];
@@ -76,6 +81,12 @@ namespace PulseChain.Gameplay {
             }
 
             _rectTransform.sizeDelta = new Vector2(64.0f, 64.0f);
+            GameObject glowObject = new GameObject("Glow");
+            glowObject.transform.SetParent(transform, false);
+            _glowImage = glowObject.AddComponent<Image>();
+            _glowImage.sprite = SpriteFactory.GetCircleSprite();
+            _glowImage.raycastTarget = false;
+            _glowImage.rectTransform.sizeDelta = new Vector2(88.0f, 88.0f);
             _coreImage = gameObject.GetComponent<Image>();
             if (_coreImage == null) {
                 _coreImage = gameObject.AddComponent<Image>();

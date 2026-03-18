@@ -84,3 +84,9 @@
 
 - Added reusable component pooling for nodes, lines, and pulses.
 - Kept the runtime Canvas-based and allocation-light for mobile.
+
+## Guided tutorial and visual refresh
+
+- Added a first-time guided tutorial that pauses gameplay and tells the player exactly what to do at each step.
+- Added retry handling for missed tutorial actions and a clean handoff into the normal run after completion.
+- Added stronger background color motion, node glow animation, and brighter pulse glow for better readability and feedback.

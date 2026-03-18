@@ -29,6 +29,16 @@ namespace PulseChain.Gameplay {
             }
         }
 
+        public float LeadPulseProgress {
+            get {
+                if (_pulses.Count == 0) {
+                    return 0.0f;
+                }
+
+                return _pulses[0].Progress;
+            }
+        }
+
         public void Initialize(RectTransform root, PulseChainDifficultySettings difficultySettings, PulseStyleConfig pulseStyleConfig, NodeSpawner nodeSpawner) {
             _root = root;
             _difficultySettings = difficultySettings;
@@ -51,11 +61,11 @@ namespace PulseChain.Gameplay {
             _isOverloadActive = score >= _difficultySettings.OverloadScoreThreshold;
 
             int desiredPulseCount = 1;
-            if (score >= _difficultySettings.MultiPulseScoreThreshold) {
+            if (!GameManager.Instance.IsTutorialActive && score >= _difficultySettings.MultiPulseScoreThreshold) {
                 desiredPulseCount = 2;
             }
 
-            if (score >= _difficultySettings.TriplePulseScoreThreshold) {
+            if (!GameManager.Instance.IsTutorialActive && score >= _difficultySettings.TriplePulseScoreThreshold) {
                 desiredPulseCount = 3;
             }
 
@@ -116,25 +126,30 @@ namespace PulseChain.Gameplay {
                 }
 
                 float arrivalDelta = Mathf.Abs(1.0f - pulse.Progress);
-                bool withinArrival = arrivalDelta <= _difficultySettings.ArrivalWindow;
-                bool perfectArrival = arrivalDelta <= _difficultySettings.PerfectArrivalWindow;
+                float tutorialArrivalWindow = GameManager.Instance.IsTutorialActive ? _difficultySettings.ArrivalWindow * 1.75f : _difficultySettings.ArrivalWindow;
+                float tutorialPerfectWindow = GameManager.Instance.IsTutorialActive ? _difficultySettings.PerfectArrivalWindow * 1.5f : _difficultySettings.PerfectArrivalWindow;
+                bool withinArrival = arrivalDelta <= tutorialArrivalWindow;
+                bool perfectArrival = arrivalDelta <= tutorialPerfectWindow;
                 AcceptZoneState acceptZone = pulse.TargetNode.Zones[pulse.TargetNode.CorrectZoneIndex];
                 float windowValue = _nodeSpawner.GetZoneWindowValue(pulse.TargetNode, acceptZone, Time.unscaledTime);
                 float windowCenter = 0.5f;
                 float zoneDelta = Mathf.Abs(windowCenter - windowValue);
                 float zoneWidth = acceptZone.Width * 0.5f;
+                if (GameManager.Instance.IsTutorialActive) {
+                    zoneWidth *= 1.6f;
+                }
                 bool zoneValid = zoneDelta <= zoneWidth;
 
                 if (!withinArrival || !zoneValid) {
                     allSuccessful = false;
                     allPerfect = false;
-                    if ((arrivalDelta <= (_difficultySettings.ArrivalWindow + 0.06f)) || (zoneDelta <= (zoneWidth + 0.08f))) {
+                    if ((arrivalDelta <= (tutorialArrivalWindow + 0.06f)) || (zoneDelta <= (zoneWidth + 0.08f))) {
                         nearMiss = true;
                     }
                     continue;
                 }
 
-                if (!perfectArrival || zoneDelta > (_difficultySettings.PerfectArrivalWindow * 0.5f)) {
+                if (!perfectArrival || zoneDelta > (tutorialPerfectWindow * 0.5f)) {
                     allPerfect = false;
                 }
             }

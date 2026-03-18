@@ -36,7 +36,7 @@ Pulse Chain is a UI-only hypercasual rhythm runner built in Unity without extern
 
 - `Assets/Scripts/UI/UIManager.cs`
   - Builds the full Canvas hierarchy at runtime.
-  - Manages HUD, energy bar, game over panel, screen flash, shake, combo pulse, and restart input.
+  - Manages HUD, first-time guided tutorial prompts, energy bar, game over panel, screen flash, shake, combo pulse, and restart input.
 
 - `Assets/Scripts/UI/NodeView.cs`
   - Renders a node using a circular UI image and animated accept-zone markers.
@@ -83,6 +83,7 @@ At runtime the following structure is created automatically:
 - Rotating and ping-pong accept zones
 - Moving nodes and fake zones at higher difficulty
 - Score, combo, overload mode, and slow motion energy
+- First-time guided tutorial with step-by-step prompts and retry flow
 - Multi-pulse gameplay with shared tap validation
 - Branching risk/reward paths based on tap side
 - Procedural audio hooks
