@@ -1,5 +1,7 @@
 ﻿using PulseChain.Core;
 
+using TMPro;
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -12,13 +14,13 @@ namespace PulseChain.Gameplay {
         private RectTransform _root;
         private RectTransform _gameplayRoot;
         private Image _background;
-        private Text _scoreText;
-        private Text _comboText;
-        private Text _metaText;
+        private TextMeshProUGUI _scoreText;
+        private TextMeshProUGUI _comboText;
+        private TextMeshProUGUI _metaText;
         private Image _energyFill;
         private Image _screenFlash;
         private GameObject _gameOverPanel;
-        private Text _gameOverText;
+        private TextMeshProUGUI _gameOverText;
         private Button _restartButton;
         private float _screenShakeTime;
         private float _successPunchTime;
@@ -170,16 +172,14 @@ namespace PulseChain.Gameplay {
         }
 
         private void BuildHud() {
-            Font font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-
             GameObject hudObject = new GameObject("HUD");
             hudObject.transform.SetParent(transform, false);
             RectTransform hudRect = hudObject.AddComponent<RectTransform>();
             StretchRect(hudRect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
 
-            _scoreText = CreateText("ScoreText", hudRect, font, 56, TextAnchor.UpperLeft, new Vector2(60.0f, -70.0f));
-            _comboText = CreateText("ComboText", hudRect, font, 40, TextAnchor.UpperLeft, new Vector2(60.0f, -145.0f));
-            _metaText = CreateText("MetaText", hudRect, font, 28, TextAnchor.UpperRight, new Vector2(-60.0f, -70.0f));
+            _scoreText = CreateText("ScoreText", hudRect, 56.0f, TextAlignmentOptions.TopLeft, new Vector2(60.0f, -70.0f));
+            _comboText = CreateText("ComboText", hudRect, 40.0f, TextAlignmentOptions.TopLeft, new Vector2(60.0f, -145.0f));
+            _metaText = CreateText("MetaText", hudRect, 28.0f, TextAlignmentOptions.TopRight, new Vector2(-60.0f, -70.0f));
 
             GameObject energyBackObject = new GameObject("EnergyBack");
             energyBackObject.transform.SetParent(hudRect, false);
@@ -202,8 +202,6 @@ namespace PulseChain.Gameplay {
         }
 
         private void BuildGameOverPanel() {
-            Font font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-
             _gameOverPanel = new GameObject("GameOverPanel");
             _gameOverPanel.transform.SetParent(transform, false);
             Image panelImage = _gameOverPanel.AddComponent<Image>();
@@ -211,7 +209,7 @@ namespace PulseChain.Gameplay {
             RectTransform panelRect = _gameOverPanel.GetComponent<RectTransform>();
             StretchRect(panelRect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
 
-            _gameOverText = CreateText("GameOverText", panelRect, font, 54, TextAnchor.MiddleCenter, Vector2.zero);
+            _gameOverText = CreateText("GameOverText", panelRect, 54.0f, TextAlignmentOptions.Center, Vector2.zero);
             RectTransform textRect = _gameOverText.GetComponent<RectTransform>();
             textRect.anchorMin = new Vector2(0.5f, 0.5f);
             textRect.anchorMax = new Vector2(0.5f, 0.5f);
@@ -230,26 +228,37 @@ namespace PulseChain.Gameplay {
             buttonRect.anchoredPosition = new Vector2(0.0f, -120.0f);
             buttonRect.sizeDelta = new Vector2(320.0f, 100.0f);
 
-            Text buttonText = CreateText("RestartText", buttonRect, font, 42, TextAnchor.MiddleCenter, Vector2.zero);
+            TextMeshProUGUI buttonText = CreateText("RestartText", buttonRect, 42.0f, TextAlignmentOptions.Center, Vector2.zero);
             buttonText.text = "Restart";
             StretchRect(buttonText.GetComponent<RectTransform>(), Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             _gameOverPanel.SetActive(false);
         }
 
-        private Text CreateText(string name, RectTransform parent, Font font, int fontSize, TextAnchor anchor, Vector2 anchoredPosition) {
+        private TextMeshProUGUI CreateText(string name, RectTransform parent, float fontSize, TextAlignmentOptions alignment, Vector2 anchoredPosition) {
             GameObject textObject = new GameObject(name);
             textObject.transform.SetParent(parent, false);
-            Text text = textObject.AddComponent<Text>();
-            text.font = font;
+            TextMeshProUGUI text = textObject.AddComponent<TextMeshProUGUI>();
+            text.font = GetFontAsset();
             text.fontSize = fontSize;
-            text.alignment = anchor;
+            text.alignment = alignment;
             text.color = Color.white;
+            text.textWrappingMode = TextWrappingModes.NoWrap;
             RectTransform rectTransform = textObject.GetComponent<RectTransform>();
             rectTransform.anchorMin = new Vector2(0.0f, 1.0f);
             rectTransform.anchorMax = new Vector2(1.0f, 1.0f);
             rectTransform.anchoredPosition = anchoredPosition;
             rectTransform.sizeDelta = new Vector2(-120.0f, 80.0f);
             return text;
+        }
+
+        private TMP_FontAsset GetFontAsset() {
+            TMP_FontAsset fontAsset = TMP_Settings.defaultFontAsset;
+            if (fontAsset != null) {
+                return fontAsset;
+            }
+
+            fontAsset = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+            return fontAsset;
         }
 
         private void RestartGame() {
