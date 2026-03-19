@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UI.ProceduralImage;
 
 namespace PulseChain.Gameplay {
     public sealed class ConnectionView : MonoBehaviour {
         private RectTransform _rectTransform;
-        private Image _image;
+        private ProceduralImage _image;
 
         public void Draw(Vector2 from, Vector2 to, Color color) {
             EnsureVisuals();
@@ -27,13 +27,20 @@ namespace PulseChain.Gameplay {
                 _rectTransform = gameObject.AddComponent<RectTransform>();
             }
 
-            _image = gameObject.GetComponent<Image>();
+            _image = gameObject.GetComponent<ProceduralImage>();
             if (_image == null) {
-                _image = gameObject.AddComponent<Image>();
+                _image = gameObject.AddComponent<ProceduralImage>();
             }
 
-            _image.sprite = SpriteFactory.GetSquareSprite();
             _image.raycastTarget = false;
+            _image.FalloffDistance = 1.0f;
+
+            UniformModifier modifier = gameObject.GetComponent<UniformModifier>();
+            if (modifier == null) {
+                modifier = gameObject.AddComponent<UniformModifier>();
+            }
+
+            modifier.Radius = 4.0f;
         }
     }
 }

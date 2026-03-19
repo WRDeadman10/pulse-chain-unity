@@ -1,6 +1,6 @@
-# Pulse Chain
+﻿# Pulse Chain
 
-Pulse Chain is a UI-only hypercasual rhythm runner built in Unity without external art assets. The game is bootstrapped entirely at runtime from the template scene and renders nodes, pulses, branches, trails, HUD, and feedback with Canvas-based `Image` components and procedural audio.
+Pulse Chain is a UI-only hypercasual rhythm runner built in Unity without gameplay art assets. The game is bootstrapped entirely at runtime from the template scene and renders nodes, pulses, branches, trails, HUD, and feedback with Canvas-based procedural UI components and procedural audio.
 
 ## Project Architecture
 
@@ -36,19 +36,30 @@ Pulse Chain is a UI-only hypercasual rhythm runner built in Unity without extern
 
 - `Assets/Scripts/UI/UIManager.cs`
   - Builds the full Canvas hierarchy at runtime.
-  - Manages HUD, first-time guided tutorial prompts, energy bar, game over panel, screen flash, shake, combo pulse, and restart input.
+  - Manages HUD, first-time guided tutorial prompts, energy bar, game over panel, screen flash, shake, combo pulse, restart input, and runtime camera-backed UI blur setup.
 
 - `Assets/Scripts/UI/NodeView.cs`
-  - Renders a node using a circular UI image and animated accept-zone markers.
+  - Renders nodes with `MPImage` procedural circles and animated accept-zone markers.
 
 - `Assets/Scripts/UI/PulseView.cs`
-  - Renders pulse visuals, style changes, scale punch, and trail state.
+  - Renders pulse visuals, style changes, scale punch, and trail state with `MPImage` procedural shapes.
 
 - `Assets/Scripts/UI/ConnectionView.cs`
-  - Draws path links between nodes with rotated UI images.
+  - Draws path links between nodes with rounded `ProceduralImage` strips.
 
 - `Assets/Scripts/UI/SpriteFactory.cs`
   - Generates procedural circle and square sprites at runtime so the project has no external art dependency.
+
+## UI Visual Stack
+
+- `Assets/Third Party UI Assets/Le Tai's Asset/TranslucentImage`
+  - Used for frosted-glass tutorial, hint, and game-over cards through a runtime-configured `TranslucentImageSource`.
+
+- `Assets/Third Party UI Assets/MPUIKit`
+  - Used for pulse shapes, node shapes, glow orbs, and decorative panel accents.
+
+- `Assets/Third Party UI Assets/ProceduralUIImage`
+  - Used for rounded HUD cards, buttons, energy bars, and connection strips.
 
 ### Systems
 
@@ -94,4 +105,5 @@ At runtime the following structure is created automatically:
 
 - The root formatting file in this repository is currently named `editorconfig`.
 - The runtime uses only Unity UI primitives and procedural textures/audio.
+- Third-party UI packages are used only for procedural rendering and blur; gameplay still uses no imported sprites or models.
 - Existing template `TutorialInfo` assets were left intact.

@@ -1,4 +1,4 @@
-# Changelog
+﻿# Changelog
 
 ## Initial project setup
 
@@ -90,3 +90,10 @@
 - Added a first-time guided tutorial that pauses gameplay and tells the player exactly what to do at each step.
 - Added retry handling for missed tutorial actions and a clean handoff into the normal run after completion.
 - Added stronger background color motion, node glow animation, and brighter pulse glow for better readability and feedback.
+
+## Third-party procedural UI integration
+
+- Integrated `TranslucentImage` for frosted-glass tutorial, hint, and game-over cards with a runtime blur source.
+- Integrated `MPUIKit` for procedural node shapes, pulse shapes, glow orbs, and panel accents.
+- Integrated `ProceduralUIImage` for rounded HUD cards, buttons, energy bars, and connection strips.
+- Converted the runtime canvas to a camera-backed UI setup so blur-based overlays render correctly.
